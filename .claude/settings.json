@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf*)"
+    ],
+    "allow": [
+      "Bash(npm install*)",
+      "Bash(npm ci)",
+      "Bash(npm run scrape)",
+      "Bash(npm test)",
+      "Bash(npx vitest*)",
+      "Bash(npx tsc*)",
+      "Bash(node*)",
+      "Bash(curl*)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git checkout*)",
+      "Bash(git branch*)",
+      "Bash(git pull*)",
+      "Bash(git init*)",
+      "Bash(git push origin main)",
+      "Bash(git push*)",
+      "Bash(git tag*)",
+      "Bash(git fetch*)",
+      "Bash(gh repo*)",
+      "Bash(gh auth*)"
+    ]
+  }
+}
