@@ -8,10 +8,22 @@ import { decideUpdate } from "./update";
 import { fetchGovBrHtml, fetchIndexers, SOURCE_URL } from "./sources";
 import type { RatesPayload } from "./types";
 
+// Caminho relativo a src/ — o JSON-banco vive na raiz do repo, em data/.
 const DATA_PATH = fileURLToPath(new URL("../data/taxas-financiamento.json", import.meta.url));
 
+/** Lê o JSON-banco atual. Mensagem dedicada se o seed estiver ausente (não deveria, está commitado). */
+function readCurrent(): RatesPayload {
+  try {
+    return JSON.parse(readFileSync(DATA_PATH, "utf-8")) as RatesPayload;
+  } catch (e) {
+    throw new Error(
+      `não foi possível ler o seed ${DATA_PATH} — ele deve estar commitado no repo. Causa: ${String(e)}`,
+    );
+  }
+}
+
 async function main(): Promise<void> {
-  const old = JSON.parse(readFileSync(DATA_PATH, "utf-8")) as RatesPayload;
+  const old = readCurrent();
 
   const html = await fetchGovBrHtml();
   const parsed = parseMcmvRatesHtml(html);
