@@ -47,8 +47,8 @@ async function main(): Promise<void> {
     `[scrape] atualizado — publishedAt=${payload.meta.publishedAt} ` +
       `retrievedAt=${payload.meta.retrievedAt} ` +
       `tr=${payload.indexers.trMonthlyPct} poup=${payload.indexers.poupancaMonthlyPct} ` +
-      `cota=SAC ${payload.cotaMaxima.sbpe.sac}%/Price ${payload.cotaMaxima.sbpe.price}% ` +
-      `tetoCM=${payload.mcmv.tetoImovel.classeMedia}`,
+      `cota=SAC ${payload.cotaMaxima?.sbpe?.sac ?? "—"}%/Price ${payload.cotaMaxima?.sbpe?.price ?? "—"}% ` +
+      `tetoCM=${payload.mcmv?.tetoImovel?.classeMedia ?? "—"}`,
   );
 }
 
