@@ -1,6 +1,6 @@
 // test/update.test.ts
 import { describe, it, expect } from "vitest";
-import { decideUpdate, isCotaPlausible, sha256 } from "../src/update";
+import { decideUpdate, isCotaPlausible, isMcmvPlausible, sha256 } from "../src/update";
 import type { ParsedRates, RatesPayload } from "../src/types";
 
 const SOURCE = "https://www.gov.br/cidades/mcmv-fgts";
@@ -193,5 +193,32 @@ describe("decideUpdate — cota", () => {
     );
     expect(r.changed).toBe(true);
     expect(r.payload.cotaMaxima.sbpe).toEqual({ sac: 80, price: 70 });
+  });
+});
+
+describe("isMcmvPlausible", () => {
+  const ok = {
+    tetoImovel: { faixa1e2: { min: 210000, max: 275000 }, faixa3: 400000, classeMedia: 600000 },
+    subsidioMaxPorRegiao: { N: 65000, demais: 55000 },
+  };
+  it("aceita limites válidos", () => {
+    expect(isMcmvPlausible(ok)).toBe(true);
+  });
+  it("rejeita null", () => {
+    expect(isMcmvPlausible(null)).toBe(false);
+  });
+  it("rejeita teto fora da faixa", () => {
+    expect(isMcmvPlausible({ ...ok, tetoImovel: { ...ok.tetoImovel, classeMedia: 10 } })).toBe(false);
+  });
+  it("rejeita faixa1e2 com max < min", () => {
+    expect(
+      isMcmvPlausible({ ...ok, tetoImovel: { ...ok.tetoImovel, faixa1e2: { min: 275000, max: 210000 } } }),
+    ).toBe(false);
+  });
+  it("rejeita subsídio fora da faixa", () => {
+    expect(isMcmvPlausible({ ...ok, subsidioMaxPorRegiao: { N: 5_000_000, demais: 55000 } })).toBe(false);
+  });
+  it("rejeita campo faltando", () => {
+    expect(isMcmvPlausible({ tetoImovel: ok.tetoImovel } as never)).toBe(false);
   });
 });
