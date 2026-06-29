@@ -6,6 +6,50 @@ atuais para o JSON público. **Editar esses repos é etapa posterior — este do
 URL pública:
 `https://cdn.jsdelivr.net/gh/alexandre-leonardo/taxas-financiamento-caixa@main/data/taxas-financiamento.json`
 
+## cotaMaxima — cota máxima de financiamento (novo)
+
+Desde 2026-06-29 o payload traz o **percentual máximo de financiamento SBPE** (cota/LTV) — sem
+endpoint novo, é só mais uma chave no mesmo JSON. Quem já faz o `fetch` recebe no próximo refresh.
+
+```jsonc
+"cotaMaxima": {
+  "sbpe": { "sac": 80, "price": 70 }, // % do valor do imóvel
+  "fonteUrl": "https://caixanoticias.caixa.gov.br/...",
+  "atualizadoEm": "2026-06-29T00:00:00.000Z"
+}
+```
+
+Tipo no consumidor (campo **opcional** de propósito — ver fallback abaixo):
+
+```ts
+export interface CotaMaxima {
+  sbpe: { sac: number; price: number };
+  fonteUrl: string;
+  atualizadoEm: string; // ISO
+}
+// em RatesPayload:
+cotaMaxima?: CotaMaxima;
+```
+
+Uso (`sac`/`price` são percentuais):
+
+```ts
+const COTA_FALLBACK = { sac: 80, price: 70 };
+const cota = rates.cotaMaxima?.sbpe ?? COTA_FALLBACK;
+const financiavel   = valorImovel * (cota.sac / 100); // SAC (Price: cota.price)
+const entradaMinima = valorImovel - financiavel;
+```
+
+Cuidados:
+- **Consumir defensivo:** o campo é aditivo. Um payload antigo em cache do jsDelivr ou o
+  `RATES_BOOTSTRAP` de fallback podem não tê-lo → usar `cotaMaxima?` + `?? COTA_FALLBACK` e
+  acrescentar `cotaMaxima` ao próprio `RATES_BOOTSTRAP`.
+- **Freshness:** `atualizadoEm` só muda quando `sac`/`price` mudam (anti-churn). Pode ser bem mais
+  antigo que `meta.retrievedAt` sem ser dado velho (a cota muda ~1×/ano). **Não** aplicar o
+  `withStaleness` das taxas à cota.
+- **Escopo:** é SBPE (SAC/Price). MCMV não tem cota no payload — lá o limite é entrada mínima +
+  subsídio, não este campo.
+
 ## projeto-simuladores
 
 Arquivo: `src/hooks/useFinancingRates.ts` (hoje retorna `RATES_BOOTSTRAP` fixo).
