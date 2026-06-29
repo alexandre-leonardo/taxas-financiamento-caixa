@@ -14,6 +14,7 @@ export interface RatesPayload {
   faixa3: RateByCotistaRegion;
   classeMedia: number;
   indexers: { trMonthlyPct: number; poupancaMonthlyPct: number };
+  cotaMaxima: CotaMaxima;
   meta: {
     sourceUrl: string;
     sourceName: string;
@@ -36,4 +37,18 @@ export interface ParsedRates {
 export interface IndexersRaw {
   trRaw: number | null;
   poupRaw: number | null;
+}
+
+// Cota máxima de financiamento SBPE (% do valor do imóvel). Aditivo ao contrato.
+export interface CotaMaxima {
+  sbpe: { sac: number; price: number };
+  fonteUrl: string;
+  atualizadoEm: string; // ISO 8601 — quando o pipeline gravou este valor
+}
+
+// Saída crua da extração de cota via LLM (null se a chamada/parse falhou).
+export interface CotaRaw {
+  sac: number;
+  price: number;
+  fonteUrl: string;
 }

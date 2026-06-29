@@ -24,6 +24,11 @@
     "trMonthlyPct": 0.1709,
     "poupancaMonthlyPct": 0.6723
   },
+  "cotaMaxima": {
+    "sbpe": { "sac": 80, "price": 70 },
+    "fonteUrl": "https://caixanoticias.caixa.gov.br/Paginas/Not%C3%ADcias/2025/10-OUTUBRO/CAIXA-e-Governo-Federal-fortalecem-politica-habitacional-com-novas-medidas-para-o-credito-imobiliario.aspx",
+    "atualizadoEm": "2026-06-29T00:00:00.000Z"
+  },
   "meta": {
     "sourceUrl": "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/habitacao/programa-minha-casa-minha-vida/mcmv-fgts",
     "sourceName": "Ministério das Cidades — MCMV Linha Financiada",

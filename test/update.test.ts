@@ -18,6 +18,11 @@ function makeOld(over: Partial<RatesPayload> = {}): RatesPayload {
     faixa3: parsed.faixa3,
     classeMedia: parsed.classeMedia,
     indexers: { trMonthlyPct: 0.1709, poupancaMonthlyPct: 0.6734 },
+    cotaMaxima: {
+      sbpe: { sac: 80, price: 70 },
+      fonteUrl: "https://caixanoticias.caixa.gov.br/x",
+      atualizadoEm: "2026-06-01T00:00:00.000Z",
+    },
     meta: {
       sourceUrl: SOURCE,
       sourceName: "Ministério das Cidades — MCMV Linha Financiada",
