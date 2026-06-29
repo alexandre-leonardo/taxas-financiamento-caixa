@@ -1,6 +1,18 @@
 // src/sources.ts
 // I/O de rede isolado. Sem lógica de negócio — só busca e normaliza dados das fontes.
-import type { IndexersRaw } from "./types";
+import type { CotaRaw, IndexersRaw } from "./types";
+
+/** Parser puro do conteúdo do LLM (JSON) → CotaRaw. null se inválido/incompleto. */
+export function parseCotaResponse(content: string): CotaRaw | null {
+  try {
+    const o = JSON.parse(content) as Record<string, unknown>;
+    if (typeof o.sac !== "number" || typeof o.price !== "number" || typeof o.fonteUrl !== "string")
+      return null;
+    return { sac: o.sac, price: o.price, fonteUrl: o.fonteUrl };
+  } catch {
+    return null;
+  }
+}
 
 export const SOURCE_URL =
   process.env.GOVBR_URL ??
