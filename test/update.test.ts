@@ -174,4 +174,20 @@ describe("decideUpdate — cota", () => {
     expect(r.changed).toBe(false);
     expect(r.payload.cotaMaxima).toEqual(makeOld().cotaMaxima);
   });
+
+  it("seed pré-feature sem cotaMaxima: não quebra e publica a cota nova", () => {
+    const oldSemCota = makeOld();
+    delete (oldSemCota as { cotaMaxima?: unknown }).cotaMaxima;
+    const oficial2 = "https://caixanoticias.caixa.gov.br/z";
+    const r = decideUpdate(
+      oldSemCota,
+      parsed,
+      same,
+      { sac: 80, price: 70, fonteUrl: oficial2 },
+      now,
+      SOURCE,
+    );
+    expect(r.changed).toBe(true);
+    expect(r.payload.cotaMaxima.sbpe).toEqual({ sac: 80, price: 70 });
+  });
 });

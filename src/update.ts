@@ -61,7 +61,7 @@ export function decideUpdate(
   let cotaChanged = false;
   if (
     isCotaPlausible(cotaRaw) &&
-    (cotaRaw.sac !== old.cotaMaxima.sbpe.sac || cotaRaw.price !== old.cotaMaxima.sbpe.price)
+    (cotaRaw.sac !== old.cotaMaxima?.sbpe?.sac || cotaRaw.price !== old.cotaMaxima?.sbpe?.price)
   ) {
     cotaChanged = true;
     cotaMaxima = {
