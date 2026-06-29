@@ -1,6 +1,7 @@
 // src/types.ts
-// Contrato público das taxas. IDÊNTICO ao RatesPayload usado hoje pelo engaja-amiz
-// (src/lib/financing/finance/rate.ts) — não alterar shape, para não quebrar consumidores.
+// Contrato público das taxas. Baseado no RatesPayload do engaja-amiz
+// (src/lib/financing/finance/rate.ts). `cotaMaxima` é uma ADIÇÃO deste repo (aditiva: consumidores
+// que não a conhecem ignoram a chave). Mudanças nos campos existentes precisam migrar consumidores.
 
 export type RateRegion = "N_NE" | "S_SE_CO";
 
