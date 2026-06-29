@@ -25,6 +25,8 @@ jobs:
 
       - name: Raspar fontes e atualizar JSON se mudou
         run: npm run scrape
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
 
       - name: Commit + push + purge jsDelivr (se mudou)
         run: |

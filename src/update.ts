@@ -1,13 +1,31 @@
 // src/update.ts
 // Núcleo de decisão — lógica PURA, sem I/O (rede ou disco). Testável em isolamento.
 import { createHash } from "node:crypto";
-import type { IndexersRaw, ParsedRates, RatesPayload } from "./types";
+import type { CotaRaw, IndexersRaw, ParsedRates, RatesPayload } from "./types";
 
 export const SOURCE_NAME = "Ministério das Cidades — MCMV Linha Financiada";
 
 /** SHA-256 hex de uma string. */
 export function sha256(s: string): string {
   return createHash("sha256").update(s).digest("hex");
+}
+
+/** Cota plausível: SAC/Price em 30–100, price ≤ sac, e fonteUrl em domínio oficial gov.br. */
+export function isCotaPlausible(c: CotaRaw | null): c is CotaRaw {
+  if (!c) return false;
+  const { sac, price, fonteUrl } = c;
+  if (typeof sac !== "number" || typeof price !== "number" || Number.isNaN(sac) || Number.isNaN(price))
+    return false;
+  if (sac < 30 || sac > 100 || price < 30 || price > 100) return false;
+  if (price > sac) return false;
+  if (typeof fonteUrl !== "string") return false;
+  let host: string;
+  try {
+    host = new URL(fonteUrl).hostname;
+  } catch {
+    return false;
+  }
+  return host === "gov.br" || host.endsWith(".gov.br");
 }
 
 /**
@@ -24,6 +42,7 @@ export function decideUpdate(
   old: RatesPayload,
   parsed: ParsedRates,
   raw: IndexersRaw,
+  cotaRaw: CotaRaw | null,
   now: Date,
   sourceUrl: string,
 ): { changed: boolean; payload: RatesPayload } {
@@ -36,10 +55,27 @@ export function decideUpdate(
       ? raw.poupRaw
       : old.indexers.poupancaMonthlyPct;
 
+  // Cota: só publica se plausível E o número (sac/price) mudou. fonteUrl varia entre runs
+  // com o mesmo valor — comparar fonteUrl geraria commit semanal espúrio.
+  let cotaMaxima = old.cotaMaxima;
+  let cotaChanged = false;
+  if (
+    isCotaPlausible(cotaRaw) &&
+    (cotaRaw.sac !== old.cotaMaxima?.sbpe?.sac || cotaRaw.price !== old.cotaMaxima?.sbpe?.price)
+  ) {
+    cotaChanged = true;
+    cotaMaxima = {
+      sbpe: { sac: cotaRaw.sac, price: cotaRaw.price },
+      fonteUrl: cotaRaw.fonteUrl,
+      atualizadoEm: now.toISOString(),
+    };
+  }
+
   const changed =
     old.meta.contentHash !== contentHash ||
     old.indexers.trMonthlyPct !== tr ||
-    old.indexers.poupancaMonthlyPct !== poup;
+    old.indexers.poupancaMonthlyPct !== poup ||
+    cotaChanged;
 
   if (!changed) return { changed: false, payload: old };
 
@@ -48,6 +84,7 @@ export function decideUpdate(
     faixa3: parsed.faixa3,
     classeMedia: parsed.classeMedia,
     indexers: { trMonthlyPct: tr, poupancaMonthlyPct: poup },
+    cotaMaxima,
     meta: {
       sourceUrl,
       sourceName: SOURCE_NAME,
